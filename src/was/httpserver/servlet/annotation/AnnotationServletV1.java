@@ -23,15 +23,16 @@ public class AnnotationServletV1 implements HttpServlet {
         String path = request.getPath();
 
         for (Object controller : controllers) {
-            Method[] methods = controller.getClass().getMethods();
+            Method[] methods = controller.getClass().getDeclaredMethods();
 
             for (Method method : methods) {
-                Mapping annotation = method.getAnnotation(Mapping.class);
-                String value = annotation.value();
-
-                if (value.equals(path)) {
-                    invoke(controller, method, request, response);
-                    return;
+                if (method.isAnnotationPresent(Mapping.class)) {
+                    Mapping mapping = method.getAnnotation(Mapping.class);
+                    String value = mapping.value();
+                    if (value.equals(path)) {
+                        invoke(controller, method, request, response);
+                        return;
+                    }
                 }
 
             }
